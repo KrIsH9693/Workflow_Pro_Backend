@@ -84,7 +84,7 @@ def create_app():
     # 1. Database & SQLAlchemy Errors (Masks database passwords & URIs)
     @app.errorhandler(SQLAlchemyError)
     def handle_database_error(error):
-        app.logger.error("Database operation failed: [Credentials Masked]")
+        app.logger.error(f"Database operation failed: {str(error)}")
         return jsonify({
             "status": "error",
             "error_type": "DatabaseError",
