@@ -1,3 +1,4 @@
+import os
 import logging
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -30,6 +31,11 @@ ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:3000",
 ]
+
+# Agar environment variable me koi custom frontend URL diya hai to use bhi CORS me include karein
+frontend_env = os.environ.get("FRONTEND_URL")
+if frontend_env and frontend_env not in ALLOWED_ORIGINS:
+    ALLOWED_ORIGINS.append(frontend_env)
 
 def create_app():
     app = Flask(__name__)
@@ -78,7 +84,6 @@ def create_app():
     # 1. Database & SQLAlchemy Errors (Masks database passwords & URIs)
     @app.errorhandler(SQLAlchemyError)
     def handle_database_error(error):
-        # Console me sanitized error record hoga, raw URI leak nahi hogi
         app.logger.error("Database operation failed: [Credentials Masked]")
         return jsonify({
             "status": "error",
@@ -118,4 +123,11 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    socketio.run(app, debug=False, host='127.0.0.1', port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    socketio.run(
+        app,
+        host='0.0.0.0',
+        port=port,
+        debug=False,
+        allow_unsafe_werkzeug=True
+    )
