@@ -17,11 +17,18 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = raw_db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # Mail / SMTP Configuration (SSL / Port 465)
 
-    # Mail / SMTP Configuration
     MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-    MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
-    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'yes').lower() in ('yes', 'true', '1')
+    MAIL_PORT = int(os.getenv('MAIL_PORT', 465))
+
+    # Safe Boolean Check (TLS vs SSL conflict na ho)
+    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'False').strip().lower() in ('yes', 'true', '1')
+    MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', 'True').strip().lower() in ('yes', 'true', '1')
+
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
+    
+    # Agar MAIL_DEFAULT_SENDER set nahi hoga toh automatic MAIL_USERNAME use karega
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('MAIL_USERNAME'))
